@@ -402,6 +402,12 @@ async def get_payments(
     offset_clause = (
         f"OFFSET {offset}" if offset and type(offset) == int and offset > 0 else ""
     )
+    # combine limit and offset clauses
+    limit_offset_clause = (
+        f"{limit_clause} {offset_clause}"
+        if limit_clause and offset_clause
+        else limit_clause or offset_clause
+    )
 
     where = ""
     if clause:
@@ -413,8 +419,7 @@ async def get_payments(
         FROM apipayments
         {where}
         ORDER BY time DESC
-        {limit_clause}
-        {offset_clause}
+        {limit_offset_clause}
         """,
         tuple(args),
     )
